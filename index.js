@@ -138,6 +138,7 @@ class SortableGrid extends Component {
     this._assignReceivedPropertiesIntoThis(properties)
     this._saveItemOrder(properties.children)
     this._removeDisappearedChildren(properties.children)
+    this.reAssessGridSize()
   }
 
   onStartDrag = (evt, gestureState) => {
@@ -288,7 +289,6 @@ class SortableGrid extends Component {
   }
 
   assessGridSize = ({nativeEvent}) => {
-    console.log("Calculating grid size");
     if (this.props.itemWidth && this.props.itemWidth < nativeEvent.layout.width) {
       this.itemsPerRow = Math.floor(nativeEvent.layout.width / this.props.itemWidth)
       this.blockWidth = nativeEvent.layout.width / this.itemsPerRow
@@ -301,6 +301,21 @@ class SortableGrid extends Component {
     if (this.state.gridLayout != nativeEvent.layout) {
       this.setState({
         gridLayout: nativeEvent.layout,
+        blockWidth: this.blockWidth,
+        blockHeight: this.blockHeight
+      })
+    }
+  }
+
+  reAssessGridSize = () => {
+    this.itemsPerRow = this.props.itemsPerRow
+    this.blockWidth = this.props.itemWidth
+    this.blockHeight = this.props.itemHeight || this.props.itemWidth
+    const gridHeight = this.itemsPerRow * this.blockHeight
+    const gridWidth = this.itemsPerRow * this.blockWidth
+    if (this.blockWidth !== this.state.blockWidth || this.blockHeight !== this.state.blockHeight) {
+      this.setState({
+        gridLayout: {width: gridWidth, height: gridHeight},
         blockWidth: this.blockWidth,
         blockHeight: this.blockHeight
       })
